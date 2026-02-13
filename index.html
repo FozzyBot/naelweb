@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Video Kartelos</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .login-container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            width: 300px;
+            position: relative;
+            z-index: 2;
+            transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+
+        .login-container.hidden {
+            opacity: 0;
+            transform: scale(0.8) translateY(-40px);
+            pointer-events: none;
+            visibility: visible;
+        }
+
+        /* Skeleton Loading - Bulat Panjang */
+        .skeleton-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 500px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+            z-index: 3;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            animation: floatSkeleton 4s ease-in-out infinite;
+            cursor: pointer;
+        }
+
+        .skeleton-container.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .skeleton-container.hidden-skeleton {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+
+        .skeleton-item {
+            width: 100%;
+            height: 80px;
+            background: linear-gradient(90deg, 
+                rgba(255,255,255,0.3) 25%, 
+                rgba(255,255,255,0.8) 50%, 
+                rgba(255,255,255,0.3) 75%);
+            background-size: 200% 100%;
+            animation: loading 1.8s infinite;
+            border-radius: 50px;
+            box-shadow: 0 4px 25px rgba(255,255,255,0.3);
+            border: 1px solid rgba(255,255,255,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 28px;
+            font-weight: 900;
+            color: #764ba2;
+            text-shadow: 0 0 10px rgba(255,255,255,0.8);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s ease;
+        }
+
+        .skeleton-item:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 35px rgba(255,255,255,0.5);
+            background: linear-gradient(90deg, 
+                rgba(255,255,255,0.4) 25%, 
+                rgba(255,255,255,0.9) 50%, 
+                rgba(255,255,255,0.4) 75%);
+            background-size: 200% 100%;
+        }
+
+        @keyframes loading {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        @keyframes floatSkeleton {
+            0%, 100% {
+                transform: translate(-50%, -50%) translateY(0px);
+            }
+            50% {
+                transform: translate(-50%, -50%) translateY(-15px);
+            }
+        }
+
+        /* Video Container - Kotak Panjang dengan 2 Video */
+        .video-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+            z-index: 4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .video-container.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .video-box {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            backdrop-filter: blur(10px);
+            animation: slideUp 0.6s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 0;
+        }
+
+        .video-box:last-child {
+            margin-bottom: 0;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .video-title {
+            font-size: 32px;
+            font-weight: 900;
+            color: #764ba2;
+            text-shadow: 0 0 10px rgba(102,126,234,0.3);
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            text-align: center;
+            text-transform: uppercase;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 15px;
+            width: 100%;
+        }
+
+        .video-link-container {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .video-link {
+            font-size: 18px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            word-break: break-all;
+            display: inline-block;
+            padding: 10px 20px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .video-link:hover {
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(255,255,255,0.3);
+            letter-spacing: 2px;
+        }
+
+        .back-button {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            font-size: 18px;
+            color: white;
+            background: rgba(255,255,255,0.2);
+            padding: 12px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            letter-spacing: 2px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.3);
+            transition: all 0.3s ease;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.6s ease, visibility 0.6s ease, transform 0.3s ease;
+            z-index: 5;
+        }
+
+        .back-button.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255,255,255,0.3);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+        
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+        
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+        }
+        
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+            text-align: center;
+            font-weight: bold;
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .bg-gradient {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-gradient"></div>
+    
+    <!-- Form Login -->
+    <div id="loginContainer" class="login-container">
+        <h2>Login Form</h2>
+        
+        <div class="input-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="Masukkan username" autocomplete="off">
+        </div>
+        
+        <div class="input-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Masukkan password">
+        </div>
+        
+        <button onclick="login()">Login</button>
+        
+        <div id="message" class="message"></div>
+    </div>
+
+    <!-- Skeleton Loading - Bulat Panjang dengan Teks VideoKartelos -->
+    <div id="skeletonContainer" class="skeleton-container" onclick="handleSkeletonClick()">
+        <div class="skeleton-item">VideoKartelos</div>
+    </div>
+
+    <!-- Video Container - 2 Kotak Panjang dengan Link -->
+    <div id="videoContainer" class="video-container">
+        <!-- Video 1: ORANG TERTABRAK OLEH MOBIL -->
+        <div class="video-box">
+            <div class="video-title">ORANG TERTABRAK OLEH MOBIL</div>
+            <div class="video-link-container">
+                <a href="https://videy.co/v/?id=QGjah0Rg1" 
+                   class="video-link" 
+                   target="_blank" 
+                   rel="noopener noreferrer">
+                    🔗 https://videy.co/v/?id=QGjah0Rg1
+                </a>
+            </div>
+        </div>
+        
+        <!-- Video 2: TIDUR PUN SODAP NIH 😋 -->
+        <div class="video-box">
+            <div class="video-title">TIDUR PUN SODAP NIH 😋</div>
+            <div class="video-link-container">
+                <a href="https://videy.co/v/?id=gQLcWtSt1" 
+                   class="video-link" 
+                   target="_blank" 
+                   rel="noopener noreferrer">
+                    🔗 https://videy.co/v/?id=gQLcWtSt1
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tombol Kembali -->
+    <div id="backButton" class="back-button" onclick="handleBackClick()">Kembali</div>
+
+    <script>
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const messageDiv = document.getElementById('message');
+            const loginContainer = document.getElementById('loginContainer');
+            const skeletonContainer = document.getElementById('skeletonContainer');
+            const videoContainer = document.getElementById('videoContainer');
+            const backButton = document.getElementById('backButton');
+            
+            // Validasi login
+            if (username === 'webnael' && password === 'web123') {
+                // Tampilkan pesan sukses dulu
+                messageDiv.className = 'message success';
+                messageDiv.innerHTML = 'Berhasil Nih. Selamat Masuk';
+                messageDiv.style.display = 'block';
+                
+                // Hilangkan form login dengan smooth
+                setTimeout(() => {
+                    loginContainer.classList.add('hidden');
+                }, 100);
+                
+                // Munculkan skeleton dengan smooth
+                setTimeout(() => {
+                    skeletonContainer.classList.add('show');
+                }, 500);
+                
+                // Sembunyikan video container dan back button kalau lagi muncul
+                videoContainer.classList.remove('show');
+                backButton.classList.remove('show');
+                
+            } else {
+                messageDiv.className = 'message error';
+                messageDiv.innerHTML = 'Salah! , chat ke telegram @devanzzweb agar mendapatkan kode nya';
+                messageDiv.style.display = 'block';
+                
+                // Reset form login (tetap muncul, gak dihide)
+                loginContainer.classList.remove('hidden');
+                skeletonContainer.classList.remove('show');
+                skeletonContainer.classList.remove('hidden-skeleton');
+                videoContainer.classList.remove('show');
+                backButton.classList.remove('show');
+            }
+        }
+
+        function handleSkeletonClick() {
+            const skeletonContainer = document.getElementById('skeletonContainer');
+            const videoContainer = document.getElementById('videoContainer');
+            const backButton = document.getElementById('backButton');
+            
+            // Hilangkan skeleton dengan smooth
+            skeletonContainer.classList.add('hidden-skeleton');
+            
+            // Munculkan video container dengan smooth
+            setTimeout(() => {
+                videoContainer.classList.add('show');
+                backButton.classList.add('show');
+            }, 300);
+        }
+
+        function handleBackClick() {
+            const skeletonContainer = document.getElementById('skeletonContainer');
+            const videoContainer = document.getElementById('videoContainer');
+            const backButton = document.getElementById('backButton');
+            
+            // Hilangkan video container dan back button
+            videoContainer.classList.remove('show');
+            backButton.classList.remove('show');
+            
+            // Munculkan skeleton lagi
+            skeletonContainer.classList.remove('hidden-skeleton');
+            
+            // Tampilkan skeleton
+            setTimeout(() => {
+                skeletonContainer.classList.add('show');
+            }, 100);
+        }
+
+        // Enter key support
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+    </script>
+</body>
+</html>
